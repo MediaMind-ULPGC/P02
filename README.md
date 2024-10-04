@@ -1,2 +1,2 @@
 # P02
-Geometric transformations
+Geometric transformations.
