@@ -151,6 +151,8 @@ while True:
 ```
 4. **Funciones adicionales**: Se implementan opciones para limpiar la selección (`d`), deshacer la última acción (`r`), y salir del programa (`q`). Esto permite al usuario gestionar su interacción de manera flexible.
 ```python
+    if key == ord('q'):
+        break
     elif key == ord('d'):
         points = []
         actions = []
