@@ -53,7 +53,7 @@ while True:
 - **Rotaciones**: La transformación de rotación permite rotar una imagen alrededor de un centro de giro, el cual se determina al pulsar el botón izquierdo del ratón. Los grados de rotación se pueden ajustar mediante un `trackbar`. Esta operación se realiza aplicando la siguiente fórmula, donde OpenCV lleva a cabo la transformación de manera directa:
 
 <p align="center">
-<img src="images/rotacion.svg" width = "250" >
+<img src="images/rotacion.svg" width = "300" >
 </p>
 
 ```python
