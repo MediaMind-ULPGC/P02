@@ -113,3 +113,51 @@ while True:
           img_display = cv.warpAffine(img_display, S, size)
           texto = f'Modo: Escalado No Uniforme'
 ```
+
+## 1b. Dada una imagen trazar una ventana de proyección y proyectar la imagen.
+Este programa permite seleccionar una región de interés en una imagen y proyectarla utilizando una transformación de perspectiva. El usuario puede especificar los puntos de la ventana de proyección directamente en la imagen mediante clics con el ratón, y el programa calculará y mostrará la imagen transformada en base a esos puntos.
+
+1. **Inicialización de variables**: Se definen listas para almacenar los puntos seleccionados (`points`) y las acciones previas (`actions`). Además, se obtiene el ancho (`w`) y la altura (`h`) de la imagen para establecer el tamaño de la proyección.
+2. **Función para guardar puntos**: Se define una función que maneja los eventos del ratón para registrar los puntos seleccionados por el usuario. Al hacer clic, se agregan las coordenadas a la lista de puntos, y al soltar el botón, se dibuja un círculo en la posición seleccionada.
+```python
+def save_point(event, x, y, flags, param):
+    global points
+    if event == cv.EVENT_LBUTTONDOWN:
+        points.append([x, y])
+    elif event == cv.EVENT_LBUTTONUP:
+        cv.circle(img, (x, y), 5, (0, 0, 255), -1)
+        actions.append(img.copy())
+        cv.imshow('image', img)
+```
+3. **Proyección de la imagen**: Cuando se han seleccionado cuatro puntos, se procede a calcular la transformación de perspectiva y a proyectar la imagen original. Adicionalmente, se dibuja un polígono verde alrededor de la región seleccionada en la imagen original. Para aplicar esta transformación, es necesario obtener primero la matriz de proyección utilizando la función `cv.getPerspectiveTransform`, a la cual se le suministran los puntos correspondientes de la imagen original y los puntos de destino a los que se desea proyectar. Esta transformación se aplica a la imagen mediante la función `cv.warpPerspective`.
+
+<p align="center">
+<img src="images/proyeccion1b.svg" width = "250" >
+</p>
+
+```python
+while True:
+    ...
+    if len(points) == 4:
+        pts2 = np.float32([points[0], points[1], points[2], points[3]])
+        
+        Tp = cv.getPerspectiveTransform(pts1, pts2)
+        img_p = cv.warpPerspective(img_orig, Tp, size)
+
+        pts = pts2.astype(np.int32)
+        pts = pts.reshape((-1,1,2))
+        cv.polylines(img, [pts], True, (0, 255, 0), 2)
+        cv.imshow('image', img_p)
+```
+4. **Funciones adicionales**: Se implementan opciones para limpiar la selección (`d`), deshacer la última acción (`r`), y salir del programa (`q`). Esto permite al usuario gestionar su interacción de manera flexible.
+```python
+    elif key == ord('d'):
+        points = []
+        actions = []
+        cv.imshow('image', img)
+    elif key == ord('r') and len(actions) != 0:
+        points.pop()
+        actions.pop()
+        img = actions[-1].copy()
+        cv.imshow('image', img)
+```
