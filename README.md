@@ -294,8 +294,148 @@ while True:
         points_orig = []
         points_dest = []
 ```
+## 2e. Calcular la imagen especular a partir de una imagen.
 
+Una imagen especular es una representación visual que muestra un objeto reflejado, como si estuviera en una superficie reflectante. Este programa permite calcular y visualizar la imagen especular de una imagen original. El usuario puede alternar entre diferentes modos de espejamiento, incluyendo espejamiento horizontal, vertical, o en ambos ejes, utilizando interacciones simples con el teclado.
 
+1. **Interacción del usuario**: El programa entra en un bucle donde el usuario puede cambiar el modo de visualización y ver los resultados en tiempo real. Las diferentes opciones de espejamiento son:
+- Normal: Muestra la imagen original.
+- Especular horizontal: Muestra la imagen reflejada en el eje horizontal (eje X).
+- Especular vertical: Muestra la imagen reflejada en el eje vertical (eje Y).
+- Especular ambas: Muestra la imagen reflejada en ambos ejes.
+  
+2. **Aplicar la transformación especular**: Según el modo seleccionado, se aplica el reflejo correspondiente a la imagen utilizando la función `cv.flip`. Se crea una copia de la imagen original para mostrarla en la ventana de visualización.
+La función `cv.flip(src, flipCode)` de OpenCV se utiliza para realizar un "volteo" (o "flip") de una imagen a lo largo de uno o más ejes. Donde el parámetro `flipCode` puede valer:
+- 0 - Volteo vertical: la imagen se voltea verticalmente, lo que significa que la parte superior de la imagen se convierte en la parte inferior, y viceversa.
+- 1 - Volteo horizontal: la imagen se voltea horizontalmente. Esto significa que la parte izquierda de la imagen se convierte en la parte derecha, y viceversa.
+- -1 - Volteo en ambas direcciones: la imagen se voltea tanto vertical como horizontalmente. Esto invierte completamente la imagen.
 
-## FINAL
+```python
+...
+while True:
+    ...
+    if mode == 'Normal':
+        img_display = img.copy()
+        texto = f'Modo: Imagen original'
+
+    elif mode == 'Especular horizontal':
+        img_display = cv.flip(img, 0)
+        texto = f'Modo: Especular eje X'
+
+    elif mode == 'Especular vertical':
+        img_display = cv.flip(img, 1)
+        texto = f'Modo: Especular eje Y'
+
+    elif mode == 'Especular ambas':
+        img_display = cv.flip(img, -1)
+        texto = f'Modo: Especular ambos ejes'
+    ...
+```
+
+## 2f. Tratar una recta que será el eje de reflexión y “reflejar” la imagen.
+
+Este programa permite reflejar una imagen a lo largo de una línea que el usuario puede dibujar en la interfaz gráfica. El usuario puede seleccionar los puntos que definen la línea de reflexión haciendo clic y arrastrando el mouse sobre la imagen.
+
+1. **Función para dibujar la línea**: La función draw_line se encarga de manejar los eventos del mouse. Permite al usuario hacer clic y arrastrar para definir la línea de reflexión.
+```python
+def draw_line(event, x, y, flags, param):
+    global point1, point2, drawing, image_copy
+
+    if event == cv.EVENT_LBUTTONDOWN:
+        drawing = True
+        point1 = (x, y)
+        point2 = (x, y)
+    
+    elif event == cv.EVENT_MOUSEMOVE:
+        if drawing:
+            image_copy = image.copy()
+            point2 = (x, y)
+            cv.line(image_copy, point1, point2, (0, 0, 255), 2)
+    
+    elif event == cv.EVENT_LBUTTONUP:
+        drawing = False
+        point2 = (x, y)
+        cv.line(image_copy, point1, point2, (0, 0, 255), 2)
+```
+
+2. **Función de reflexión**: La función reflect_image toma la imagen y los puntos que definen la línea de reflexión para calcular la matriz de transformación. En resumen, la reflexión de una imagen a través de una línea definida por dos puntos implica:
+- Calcular el vector normal a la línea.
+- Construir la matriz de reflexión.
+- Aplicar traslaciones para mover la línea de reflexión al origen y volver a su posición original después de la reflexión.
+- Componer todas las transformaciones y aplicarlas a la imagen.
+Esto permite reflejar la imagen de manera precisa a través de la línea definida por los puntos $p1$ y $p2$.
+
+```python
+def reflect_image(image, point1, point2):
+    p1 = np.array(point1, dtype=np.float32)
+    p2 = np.array(point2, dtype=np.float32)
+    
+    delta = p2 - p1
+    normal = np.array([-delta[1], delta[0]])
+    normal /= np.linalg.norm(normal)
+    
+    reflection_matrix = np.eye(3)
+    reflection_matrix[0, 0] = 1 - 2 * normal[0] * normal[0]
+    reflection_matrix[0, 1] = -2 * normal[0] * normal[1]
+    reflection_matrix[1, 0] = -2 * normal[0] * normal[1]
+    reflection_matrix[1, 1] = 1 - 2 * normal[1] * normal[1]
+    
+    translation_to_origin = np.eye(3)
+    translation_to_origin[0, 2] = -p1[0]
+    translation_to_origin[1, 2] = -p1[1]
+    
+    translation_back = np.eye(3)
+    translation_back[0, 2] = p1[0]
+    translation_back[1, 2] = p1[1]
+    
+    transform = translation_back @ reflection_matrix @ translation_to_origin
+    
+    reflected_image = cv.warpAffine(image, transform[:2], (image.shape[1], image.shape[0]), flags=cv.INTER_LINEAR)
+    
+    return reflected_image
+```
+
+## 2g. Aportaciones propias.
+
+- Visualización del Modo de Transformación Geométrica. El código permite mostrar el modo actual de transformación geométrica en la interfaz gráfica del programa durante un tiempo específico, que en este caso es de dos segundos. 
+```python
+show_text = False
+text_display_time = 2
+text_start_time = 0
+while True:
+    if key == ord('m'):
+        ...
+        show_text = True
+        text_start_time = time.time()
+    ...
+    if mode == 'Traslación':
+        ...
+        texto = f'Modo: Traslacion'
+       
+    elif mode == 'Rotación':
+        ...
+        texto = f'Modo: Rotacion'
+
+    elif mode == 'Escalado Uniforme':
+        ...
+        texto = f'Modo: Escalado Uniforme'
+
+    elif mode == 'Escalado No Uniforme':
+        ...
+        texto = f'Modo: Escalado No Uniforme'
+
+    current_time = time.time()
+    if show_text:
+        elapsed_time = current_time - text_start_time
+        if elapsed_time < text_display_time:
+            cv.rectangle(img_display, (0, 0), (500, 30), (0, 0, 0), cv.FILLED)
+            cv.putText(img_display, texto, (10, 20), cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv.LINE_AA)
+        else:
+            show_text = False
+```
+
+- Manual de texto: se ha incorporado en el apartado 1a un manual de texto ue le da instrucciones al usuario de como interactuar con el programa
+
+  
+## Faltan aportacones propias y trabajo futuro
 - problemas en lo de girar
