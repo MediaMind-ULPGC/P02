@@ -163,3 +163,18 @@ while True:
         img = actions[-1].copy()
         cv.imshow('image', img)
 ```
+## 1c. Desarrollar una aplicación que lleve a cabo distorsiones de la lente. Para ello los coeficientes de distorsión deben gobernarse a través de una interfaz.
+Este programa permite aplicar distorsiones de lente a una imagen, utilizando dos coeficientes de distorsión (`K1` y `K2`) que pueden ser ajustados a través de una interfaz con barras deslizantes (`trackbars`). El usuario puede modificar estos valores en tiempo real, visualizando los efectos de la distorsión en la imagen.
+1. **Definir la función de distorsión**: La función `apply_distortion` aplica la distorsión a la imagen utilizando los coeficientes `K1` y `K2`, que definen la intensidad de la distorsión.
+   
+<p align="center">
+<img src="images/distorciones.svg" width = "250" >
+</p>
+
+ Donde:
+   - $ r $ es la distancia radial desde el centro de la imagen (el punto de origen de las distorsiones).
+   - $ k_1 $, $ k_2 $, y $ k_3 $ son los coeficientes de distorsión radial.
+
+Esta distorsión se clasifica principalmente en dos tipos:
+- Distorsión en barril (Barrel Distortion): Ocurre cuando las líneas rectas en los bordes de la imagen parecen curvarse hacia adentro, como si estuvieran envolviendo un barril. $k_1 < 0 $, la imagen se curva hacia adentro.
+- Distorsión en cojín (Pincushion Distortion): Ocurre cuando las líneas rectas en los bordes de la imagen parecen curvarse hacia afuera, dando una apariencia similar a un cojín de alfileres. $k_1 > 0 $, la imagen se curva hacia afuera.
