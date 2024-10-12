@@ -168,7 +168,7 @@ Este programa permite aplicar distorsiones de lente a una imagen, utilizando dos
 1. **Definir la función de distorsión**: La función `apply_distortion` aplica la distorsión a la imagen utilizando los coeficientes `K1` y `K2`, que definen la intensidad de la distorsión.
    
 <p align="center">
-<img src="images/distorciones.svg" width = "250" >
+<img src="images/distorciones.svg" width = "300" >
 </p>
 
  Donde:
@@ -178,3 +178,124 @@ Este programa permite aplicar distorsiones de lente a una imagen, utilizando dos
 Esta distorsión se clasifica principalmente en dos tipos:
 - Distorsión en barril (Barrel Distortion): Ocurre cuando las líneas rectas en los bordes de la imagen parecen curvarse hacia adentro, como si estuvieran envolviendo un barril. $k_1 < 0 $, la imagen se curva hacia adentro.
 - Distorsión en cojín (Pincushion Distortion): Ocurre cuando las líneas rectas en los bordes de la imagen parecen curvarse hacia afuera, dando una apariencia similar a un cojín de alfileres. $k_1 > 0 $, la imagen se curva hacia afuera.
+```python
+def apply_distortion(image, k1, k2):
+    h, w = image.shape[:2]
+    distCoeff = np.zeros((4,1), np.float64)
+    distCoeff[0,0] = k1
+    distCoeff[1,0] = k2
+
+    cam = np.eye(3, dtype=np.float32)
+    cam[0,2] = w/2.0 
+    cam[1,2] = h/2.0
+    cam[0,0] = 10.
+    cam[1,1] = 10.
+
+    distorted_img = cv.undistort(image, cam, distCoeff)
+    return distorted_img
+```
+2. **Función de actualización** de la imagen La función `update_image` se encarga de leer los valores de las barras deslizantes y aplicar la distorsión a la imagen. Dependiendo de los valores de `K1` y `K2`, se actualiza la imagen mostrada.
+```python
+def update_image(val):
+    global image
+    k1 = (cv.getTrackbarPos('K1', 'DistLente') - 100) / 100000.0
+    k2 = (cv.getTrackbarPos('K2', 'DistLente') - 100) / 100000.0
+
+    if k1 != 0 or k2 != 0:
+        distorted_img = apply_distortion(image, k1, k2)
+        return distorted_img
+    else:
+        return image
+```
+3. **Visualización de la imagen**: El programa entra en un bucle donde se actualiza continuamente la imagen en función de los valores de las barras deslizantes. Pulsando la tecla 'd' se restablece la imagen original y la tecla 'Esc' cierra la ventana.
+
+## 2a. Marcar el punto de giro con el ratón.
+En esta sección, la única modificación respecto al apartado 1a es la incorporación de un círculo que se dibuja cuando se hace *click* con el ratón en el modo de rotación. Al detectar el evento de selección del punto de giro, se utiliza la función `cv.circle` para pintar un círculo en las coordenadas seleccionadas. Este círculo representa visualmente el centro de rotación de la imagen.
+```python
+def get_center(event, x, y, flags, param):
+    ...
+        if mode == 'Rotación':
+            cv.circle(img, (center[0], center[1]), 5, (0, 0, 255), -1)
+        return center
+```
+
+## 2b. Trasladar la imagen arrastrándolo con el ratón y visualizarlo en tiempo real.
+
+En este apartado, a diferencia del apartado 1a, se implementa la funcionalidad de mover la imagen arrastrándola con el ratón. Para ello, se ha definido una variable `dragging`, la cual se activa cuando se encuentra en el modo de traslación. Mientras se detecta el movimiento del ratón mediante el evento `cv.EVENT_MOUSEMOVE`, se actualiza el nuevo centro de traslación de la imagen, permitiendo que esta se desplace en tiempo real conforme se arrastra el ratón.
+
+```python
+def get_center(event, x, y, flags, param):
+    global center, show_text, text_start_time, dragging, prev_mouse_pos
+    if event == cv.EVENT_LBUTTONDOWN:
+        center = (x, y)
+        if mode == 'Traslación':
+            dragging = True
+    elif event == cv.EVENT_MOUSEMOVE and dragging:
+        dx = x - prev_mouse_pos[0]
+        dy = y - prev_mouse_pos[1]
+        center = (center[0] + dx, center[1] + dy)
+        prev_mouse_pos = (x, y)
+
+    elif event == cv.EVENT_LBUTTONUP:
+        dragging = False
+        return center
+```
+
+## 2c. Hacer la parte obligatoria sobre vídeo en lugar de sobre imagen.
+En este apartado, el procedimiento es similar al de la parte obligatoria que utiliza imágenes, con la diferencia de que se emplea un flujo de vídeo capturado desde la cámara web del dispositivo en el que se está ejecutando el programa. Las transformaciones se aplican a cada uno de los fotogramas del vídeo en tiempo real.
+
+```python
+video = cv.VideoCapture(0)
+_, frame = video.read()
+...
+while True:
+    _, frame = video.read()
+    ...
+video.release()
+```
+
+## 2d. Dada una imagen seleccionar tres puntos de la imagen original y tres puntos en una imagen destino y realizar la transformación afín
+
+Este programa permite aplicar una transformación afín a una imagen mediante la selección interactiva de tres puntos en la imagen original y tres puntos correspondientes en una imagen de destino. La transformación afín preserva la colinealidad de los puntos y las proporciones entre distancias a lo largo de las líneas paralelas, aunque no necesariamente mantiene las distancias y ángulos originales. El proceso se lleva a cabo de manera interactiva utilizando el ratón para seleccionar los puntos en la imagen.
+
+La fórmula general de la transformación afín está dada por:
+
+<p align="center">
+<img src="images/afin.svg" width = "300" >
+</p>
+
+1. **Seleccionar puntos en la imagen**: El usuario puede hacer clic con el ratón sobre la imagen para seleccionar tres puntos en la imagen original. Luego, se seleccionan tres puntos en la imagen destino que representarán los puntos a los cuales se va a mapear la imagen original. Los puntos seleccionados se muestran en la imagen con pequeños círculos.
+
+```python
+def select_points(event, x, y, flags, param):
+    if event == cv.EVENT_LBUTTONDOWN:
+        if len(points_orig) < 3:
+            points_orig.append([x, y])
+            cv.circle(img, (x, y), 5, (0, 0, 255), -1)
+        elif len(points_orig) == 3 and len(points_dest) < 3:
+            points_dest.append([x, y])
+            cv.circle(img, (x, y), 5, (255, 0, 0), -1)
+```
+2. **Aplicar la transformación afín**: Una vez seleccionados los tres puntos en ambas imágenes, se calcula la matriz de transformación afín utilizando la función `cv.getAffineTransform`. Esta matriz se utiliza para transformar la imagen original, ajustándola a los puntos seleccionados en la imagen destino.
+
+```python
+def apply_affine_transform(img, points_orig, points_dest):
+    pts1 = np.float32(points_orig)
+    pts2 = np.float32(points_dest)
+    M = cv.getAffineTransform(pts1, pts2)
+    img_transformed = cv.warpAffine(img, M, size)
+    return img_transformed
+...
+while True:
+    ...
+    if len(points_orig) == 3 and len(points_dest) == 3:
+        img = apply_affine_transform(img_copy, points_orig, points_dest)
+        img_copy = img.copy()
+        points_orig = []
+        points_dest = []
+```
+
+
+
+## FINAL
+- problemas en lo de girar
