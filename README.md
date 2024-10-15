@@ -463,5 +463,6 @@ Es importante señalar que el manual se ejecuta de manera simultánea a la inter
   
 ## Trabajo futuro
 - Al aplicar la rotación por primera vez, el punto de giro se selecciona correctamente y la imagen rota en torno a dicho punto. No obstante, al intentar realizar una segunda rotación sobre la imagen ya rotada, esta se desplaza, con el propósito de que la imagen regrese a su posición original. Como mejora futura, se propone corregir esta traslación para permitir que las rotaciones se apliquen de manera consecutiva sin alterar la ubicación actual de la imagen.
+- Captura y almacenamiento de la imagen trasnformada y su matriz: Permitir a los usuarios capturar la imagen y guardarl como una imagen en formatos estándar (por ejemplo, PNG o JPEG), así como su matriz en formato Matlab (.mtx).
+- Carga y edición de imágenes: Incorporar la opción de cargar una imagen existente del usuario, brindando la posibilidad aplicar las transformaicones sobre ella.
 
-# FALTA APORTACONES PROPIAS Y TRAAJO FUTURO CON GERARDO
