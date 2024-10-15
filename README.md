@@ -4,11 +4,11 @@ Integrantes:
 - Gerardo León Quintana
 - Susana Suárez Mendoza
 
-# Instrucciines de uso OPTATIVO
-
 ## 1a. Desarrollar una aplicación que lleve a cabo transformaciones de la imagen en tiempo real a través de una interfaz basada en trackbars o equivalente.
 Este programa permite realizar transformaciones en tiempo real sobre una imagen mediante una interfaz que utiliza barras deslizantes (trackbars). Las transformaciones disponibles incluyen traslaciones, rotaciones y escalados, tanto uniformes como no uniformes. La interfaz es intuitiva y permite al usuario ajustar parámetros dinámicamente para visualizar los cambios en la imagen al instante.
-**Flujo del programa:**
+
+**Flujo del programa**
+
 1. **Cargar la imagen**
 ```python
 img = cv.imread('./images/img_cuadro.jpg', cv.IMREAD_COLOR)
@@ -27,7 +27,7 @@ cv.createTrackbar('Escala', 'image', 50, 100, nothing)
 cv.createTrackbar('Escala X', 'image', 50, 100, nothing)
 cv.createTrackbar('Escala Y', 'image', 50, 100, nothing)
 ```
-3. **Visualización de la imagen**: La imagen original se muestra en una ventana, y los cambios se aplican en tiempo real. Se alterna entre diferentes modos de transformación (traslación, rotación, escalado) al presionar la tecla 'm'.
+3. **Visualización de la imagen**: La imagen original se muestra en una ventana, y los cambios se aplican en tiempo real. Se alterna entre diferentes modos de transformación (traslación, rotación, escalado) al presionar la tecla `m`.
 ```python
 while True:
     key = cv.waitKey(1) & 0xFF
@@ -115,10 +115,10 @@ while True:
 ```
 
 ## 1b. Dada una imagen trazar una ventana de proyección y proyectar la imagen.
-Este programa permite seleccionar una región de interés en una imagen y proyectarla utilizando una transformación de perspectiva. El usuario puede especificar los puntos de la ventana de proyección directamente en la imagen mediante clics con el ratón, y el programa calculará y mostrará la imagen transformada en base a esos puntos.
+Este programa permite seleccionar una región de interés en una imagen y proyectarla utilizando una transformación de perspectiva. El usuario puede especificar los puntos de la ventana de proyección directamente en la imagen mediante *clicks* con el ratón, y el programa calculará y mostrará la imagen transformada en base a esos puntos.
 
 1. **Inicialización de variables**: Se definen listas para almacenar los puntos seleccionados (`points`) y las acciones previas (`actions`). Además, se obtiene el ancho (`w`) y la altura (`h`) de la imagen para establecer el tamaño de la proyección.
-2. **Función para guardar puntos**: Se define una función que maneja los eventos del ratón para registrar los puntos seleccionados por el usuario. Al hacer clic, se agregan las coordenadas a la lista de puntos, y al soltar el botón, se dibuja un círculo en la posición seleccionada.
+2. **Función `save_point`**: Se define una función que maneja los eventos del ratón para registrar los puntos seleccionados por el usuario. Al hacer *click*, se agregan las coordenadas a la lista de puntos, y al soltar el botón, se dibuja un círculo en la posición seleccionada.
 ```python
 def save_point(event, x, y, flags, param):
     global points
@@ -172,12 +172,12 @@ Este programa permite aplicar distorsiones de lente a una imagen, utilizando dos
 </p>
 
  Donde:
-   - $ r $ es la distancia radial desde el centro de la imagen (el punto de origen de las distorsiones).
-   - $ k_1 $, $ k_2 $, y $ k_3 $ son los coeficientes de distorsión radial.
+   - $r$ es la distancia radial desde el centro de la imagen (el punto de origen de las distorsiones).
+   - $k_1$, $k_2$, y $k_3$ son los coeficientes de distorsión radial.
 
 Esta distorsión se clasifica principalmente en dos tipos:
-- Distorsión en barril (Barrel Distortion): Ocurre cuando las líneas rectas en los bordes de la imagen parecen curvarse hacia adentro, como si estuvieran envolviendo un barril. $k_1 < 0 $, la imagen se curva hacia adentro.
-- Distorsión en cojín (Pincushion Distortion): Ocurre cuando las líneas rectas en los bordes de la imagen parecen curvarse hacia afuera, dando una apariencia similar a un cojín de alfileres. $k_1 > 0 $, la imagen se curva hacia afuera.
+- Distorsión en barril (Barrel Distortion): Ocurre cuando las líneas rectas en los bordes de la imagen parecen curvarse hacia adentro, como si estuvieran envolviendo un barril. $k_1 < 0$, la imagen se curva hacia adentro.
+- Distorsión en cojín (Pincushion Distortion): Ocurre cuando las líneas rectas en los bordes de la imagen parecen curvarse hacia afuera, dando una apariencia similar a un cojín de alfileres. $k_1 > 0$, la imagen se curva hacia afuera.
 ```python
 def apply_distortion(image, k1, k2):
     h, w = image.shape[:2]
@@ -207,7 +207,7 @@ def update_image(val):
     else:
         return image
 ```
-3. **Visualización de la imagen**: El programa entra en un bucle donde se actualiza continuamente la imagen en función de los valores de las barras deslizantes. Pulsando la tecla 'd' se restablece la imagen original y la tecla 'Esc' cierra la ventana.
+3. **Visualización de la imagen**: El programa entra en un bucle donde se actualiza continuamente la imagen en función de los valores de las barras deslizantes. Pulsando la tecla `d` se restablece la imagen original y la tecla `Esc` cierra la ventana.
 
 ## 2a. Marcar el punto de giro con el ratón.
 En esta sección, la única modificación respecto al apartado 1a es la incorporación de un círculo que se dibuja cuando se hace *click* con el ratón en el modo de rotación. Al detectar el evento de selección del punto de giro, se utiliza la función `cv.circle` para pintar un círculo en las coordenadas seleccionadas. Este círculo representa visualmente el centro de rotación de la imagen.
@@ -264,7 +264,7 @@ La fórmula general de la transformación afín está dada por:
 <img src="images/afin.svg" width = "300" >
 </p>
 
-1. **Seleccionar puntos en la imagen**: El usuario puede hacer clic con el ratón sobre la imagen para seleccionar tres puntos en la imagen original. Luego, se seleccionan tres puntos en la imagen destino que representarán los puntos a los cuales se va a mapear la imagen original. Los puntos seleccionados se muestran en la imagen con pequeños círculos.
+1. **Seleccionar puntos en la imagen**: El usuario puede hacer *click* con el ratón sobre la imagen para seleccionar tres puntos en la imagen original. Luego, se seleccionan tres puntos en la imagen destino que representarán los puntos a los cuales se va a mapear la imagen original. Los puntos seleccionados se muestran en la imagen con pequeños círculos.
 
 ```python
 def select_points(event, x, y, flags, param):
@@ -332,11 +332,11 @@ while True:
     ...
 ```
 
-## 2f. Tratar una recta que será el eje de reflexión y “reflejar” la imagen.
+## 2f. Trazar una recta que será el eje de reflexión y “reflejar” la imagen.
 
-Este programa permite reflejar una imagen a lo largo de una línea que el usuario puede dibujar en la interfaz gráfica. El usuario puede seleccionar los puntos que definen la línea de reflexión haciendo clic y arrastrando el mouse sobre la imagen.
+Este programa permite reflejar una imagen a lo largo de una línea que el usuario puede dibujar en la interfaz gráfica. El usuario puede seleccionar los puntos que definen la línea de reflexión haciendo *click* y arrastrando el mouse sobre la imagen.
 
-1. **Función para dibujar la línea**: La función draw_line se encarga de manejar los eventos del mouse. Permite al usuario hacer clic y arrastrar para definir la línea de reflexión.
+1. **Función para dibujar la línea**: La función `draw_line` se encarga de manejar los eventos del mouse. Permite al usuario hacer *click* y arrastrar para definir la línea de reflexión.
 ```python
 def draw_line(event, x, y, flags, param):
     global point1, point2, drawing, image_copy
@@ -358,7 +358,7 @@ def draw_line(event, x, y, flags, param):
         cv.line(image_copy, point1, point2, (0, 0, 255), 2)
 ```
 
-2. **Función de reflexión**: La función reflect_image toma la imagen y los puntos que definen la línea de reflexión para calcular la matriz de transformación. En resumen, la reflexión de una imagen a través de una línea definida por dos puntos implica:
+2. **Función de reflexión**: La función `reflect_image` toma la imagen y los puntos que definen la línea de reflexión para calcular la matriz de transformación. En resumen, la reflexión de una imagen a través de una línea definida por dos puntos implica:
 - Calcular el vector normal a la línea.
 - Construir la matriz de reflexión.
 - Aplicar traslaciones para mover la línea de reflexión al origen y volver a su posición original después de la reflexión.
@@ -397,7 +397,7 @@ def reflect_image(image, point1, point2):
 
 ## 2g. Aportaciones propias.
 
-- Visualización del Modo de Transformación Geométrica. El código permite mostrar el modo actual de transformación geométrica en la interfaz gráfica del programa durante un tiempo específico, que en este caso es de dos segundos. 
+- **Visualización del Modo de Transformación Geométrica**. El código permite mostrar el modo actual de transformación geométrica en la interfaz gráfica del programa durante un tiempo específico, que en este caso es de dos segundos. 
 ```python
 show_text = False
 text_display_time = 2
@@ -434,8 +434,34 @@ while True:
             show_text = False
 ```
 
-- Manual de texto: se ha incorporado en el apartado 1a un manual de texto ue le da instrucciones al usuario de como interactuar con el programa
+- **Manual de texto**: Se ha implementado un manual de texto que proporciona instrucciones detalladas al usuario sobre cómo interactuar con el programa utilizando el módulo tkinter de Python, empleado para la creación de interfaces gráficas de usuario (GUI). Este manual permite al usuario acceder a todas las opciones del programa introduciendo el comando help, como se ilustra en la Figura 1. Asimismo, el manual permite especificar el modo de uso del programa según el tipo de transformación que se desee aplicar a la imagen, tal y como se muestra en la Figura 2.
+
+```python
+class CustomShell:
+    # Configura la ventana gráfica y prepara los componentes (área de texto e input).
+    def __init__(self, master, close_queue):
+        ...
+
+    # Procesa la entrada del usuario, ejecutando comandos o mostrando mensajes de error.
+    def process_input(self, event):
+        ...
+
+    #  Revisa si se ha enviado un mensaje a la cola para cerrar el shell y lo hace si es necesario.
+    def check_queue(self):
+        ...
+```
+Es importante señalar que el manual se ejecuta de manera simultánea a la interfaz gráfica desarrollada con OpenCV. No obstante, si el manual se cierra, la interfaz de OpenCV continuará en ejecución. Por el contrario, si la interfaz de OpenCV se cierra, el manual también finalizará su ejecución, dado que perdería su funcionalidad sin la interacción con la interfaz gráfica.
+
+<div align="center">
+   
+| <img src="images/manual_help.png" alt="Img Manual help" width="550"/> | <img src="images/manual_traslacion.png" alt="Img Manual Traslacion" width="550"/> |
+|:--:|:--:|
+| **Figura 1.** Manual de texto. | **Figura 2.** Especificaciones del modo traslación. |
+   
+</div>
 
   
-## Faltan aportacones propias y trabajo futuro
-- problemas en lo de girar
+## Trabajo futuro
+- Al aplicar la rotación por primera vez, el punto de giro se selecciona correctamente y la imagen rota en torno a dicho punto. No obstante, al intentar realizar una segunda rotación sobre la imagen ya rotada, esta se desplaza, con el propósito de que la imagen regrese a su posición original. Como mejora futura, se propone corregir esta traslación para permitir que las rotaciones se apliquen de manera consecutiva sin alterar la ubicación actual de la imagen.
+
+# FALTA APORTACONES PROPIAS Y TRAAJO FUTURO CON GERARDO
